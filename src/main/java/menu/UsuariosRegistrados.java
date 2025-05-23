@@ -1,24 +1,21 @@
 package menu;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDateTime;
 
 public class UsuariosRegistrados {
     private String nombre;
     private String apellido;
     private int cedula;
     private int claveNumerica;
+    private String fecha;
 
-    
 
-    public UsuariosRegistrados() {
-    }
-
-    public UsuariosRegistrados(String nombre, String apellido, int cedula, int claveNumerica) {
+    public UsuariosRegistrados(String nombre, String apellido, int cedula, int claveNumerica, String fecha) {
         this.nombre = nombre;
         this.apellido = apellido;
         this.cedula = cedula;
         this.claveNumerica = claveNumerica;
+        this.fecha = fecha;
         
     }
 

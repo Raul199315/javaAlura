@@ -1,103 +1,111 @@
 package menu;
 
-import com.google.gson.Gson;
+import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
+import menu.UsuariosRegistrados;
 
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.chrono.ChronoLocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 public class Menu {
-    ///  variable
     private Scanner teclado = new Scanner(System.in);
-    private Scanner teclado1 = new Scanner(System.in);
-    private Scanner teclado2 = new Scanner(System.in);
-    private Scanner teclado3 = new Scanner(System.in);
     private boolean bandera = true;
-    private boolean bandera1 = true;
-    private int opcion;
-    private String nombre;
-    private String apellido;
-    private int numeroDeCedula;
-    private int clave;
-    private List<modelos.UsuariosRegistrados> usuarios = new ArrayList();
-    modelos.UsuariosRegistrados agregar= new modelos.UsuariosRegistrados();
-    Gson gson = new Gson();
-    String json = gson.toJson(usuarios);
+    private List<UsuariosRegistrados> usuarios = new ArrayList<>();
 
-    ///  variables validacion de iniicio de seccion
-    int cc;
-    int cl;
+    public void menu() {
+        String archivo = "usuariosRegistrados.json";
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-    public void menu (){
-
-        while (bandera){
-
-
-            System.out.printf("""
-                    Bienvenidos a SuTienda
-                    
-                    1 Iniciar Seccion
-                    2 Registrarse
-                    3 Ver Productos
-                    3 Salir
-                    
-                    Seleciona una opcion valida
-                    """);
-            opcion= teclado.nextInt();
-            if (opcion==1){
-                    while (bandera1) {
-                        System.out.printf("Ingresa su cedula");
-                        cc = teclado.nextInt();
-                        System.out.printf("Ingrese la clave");
-                        cl = teclado1.nextInt();
-
-                        if (cl == usuarios.get(0).getClaveNumerica() && cc == usuarios.get(0).getCedula()) {
-                            System.out.printf("Incio de Seccion Exitoso BIENVENIDO: " + usuarios.get(0).getNombre());
-                            bandera1= false;
-                            bandera1= false;
-                        }else {
-                            System.out.printf("Credenciales incorrectas");
-                        }
-
-                    }
-
-
-            }else if(opcion ==2){
-                System.out.printf("Ingrese Su nombre");
-                nombre = teclado1.nextLine();
-                System.out.printf("Ingrese Su Apellido");
-                apellido = teclado2.nextLine();
-                System.out.printf("Ingrese Su Numero De CC");
-                numeroDeCedula = teclado3.nextInt();
-                System.out.printf("Ingrese su nueva Contraseña");
-                clave = teclado.nextInt();
-                usuarios.add(new modelos.UsuariosRegistrados(nombre,apellido,numeroDeCedula, clave));
-                System.out.printf("registro exitoso "+ usuarios.get(0) );
-
-
-
-
-            } else if (opcion == 3) {
-                /// escribir o crear el json
-                try (FileWriter writer= new FileWriter("usuarioRegistrados.json")){
-                    writer.write(json);
-                }catch (IOException e) {
-                    System.out.printf("Ocurrio un error al crear el json");
-                }
-                bandera = false;
-                System.out.printf("Saliendo.........................");
+        // **Leer JSON existente**
+        try (Reader reader = new FileReader(archivo)) {
+            usuarios = gson.fromJson(reader, new TypeToken<List<UsuariosRegistrados>>() {}.getType());
+            if (usuarios == null) { // Si la lectura devuelve null, inicializar la lista
+                usuarios = new ArrayList<>();
             }
-
-
+        } catch (IOException e) {
+            System.out.println("Archivo JSON no encontrado, se creará uno nuevo.");
+            usuarios = new ArrayList<>(); // Asegurarse de que la lista esté inicializada
         }
 
+        while (bandera) {
+            System.out.printf("""
+                Bienvenidos a SuTienda
+                
+                1. Iniciar Sesión
+                2. Registrarse
+                3. Ver productos
+                4. Salir
+                
+                Selecciona una opción válida:
+                """);
 
+            int opcion = teclado.nextInt();
+            teclado.nextLine(); // Limpiar buffer
 
+            if (opcion == 1) {
+                iniciarSesion();
+            } else if (opcion == 2) {
+                registrarUsuario();
+            } else if (opcion == 3) {
+                verUsuarios();
+            } else if (opcion == 4) {
+                guardarUsuarios(archivo, gson);
+                bandera = false;
+                System.out.println("Saliendo...");
+            }
+        }
     }
-    public void menuUsuariosRegistrados(){
-        
+
+    private void iniciarSesion() {
+        System.out.println("Ingrese su cédula:");
+        int cc = teclado.nextInt();
+        System.out.println("Ingrese su clave:");
+        int cl = teclado.nextInt();
+
+        for (UsuariosRegistrados usuario : usuarios) {
+            if (usuario.getCedula() == cc && usuario.getClaveNumerica() == cl) {
+                System.out.println("Inicio de sesión exitoso. Bienvenido, " + usuario.getNombre());
+                return;
+            }
+        }
+        System.out.println("Credenciales incorrectas.");
     }
 
+    private void registrarUsuario() {
+        System.out.println("Ingrese su nombre:");
+        String nombre = teclado.next();
+        System.out.println("Ingrese su apellido:");
+        String apellido = teclado.next();
+        System.out.println("Ingrese su número de cédula:");
+        int numeroDeCedula = teclado.nextInt();
+        System.out.println("Ingrese su nueva contraseña:");
+        int clave = teclado.nextInt();
+        String fecha = String.valueOf(LocalDate.now());
+
+
+
+        usuarios.add(new UsuariosRegistrados(nombre, apellido, numeroDeCedula, clave,fecha));
+        System.out.println("Registro exitoso.");
+    }
+
+    private void verUsuarios() {
+        System.out.println("Usuarios registrados:");
+        for (UsuariosRegistrados usuario : usuarios) {
+            System.out.println(usuario.getNombre() + " " + usuario.getApellido() + " - CC: " + usuario.getCedula());
+        }
+    }
+
+    private void guardarUsuarios(String archivo, Gson gson) {
+        try (FileWriter writer = new FileWriter(archivo)) {
+            gson.toJson(usuarios, writer);
+            System.out.println("Datos guardados correctamente.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
