@@ -3,6 +3,7 @@ package menu;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import menu.UsuariosRegistrados;
+import tajetas.TarjetaCredito;
 
 import java.io.*;
 import java.time.LocalDate;
@@ -14,8 +15,11 @@ import java.util.Scanner;
 
 public class Menu {
     private Scanner teclado = new Scanner(System.in);
+    private Scanner teclado1 = new Scanner(System.in);
     private boolean bandera = true;
     private List<UsuariosRegistrados> usuarios = new ArrayList<>();
+    MenuSeccion menuSeccion = new  MenuSeccion();
+
 
     public void menu() {
         String archivo = "usuariosRegistrados.json";
@@ -33,6 +37,7 @@ public class Menu {
         }
 
         while (bandera) {
+            usuarios.forEach(System.out::println);
             System.out.printf("""
                 Bienvenidos a SuTienda
                 
@@ -48,10 +53,38 @@ public class Menu {
             teclado.nextLine(); // Limpiar buffer
 
             if (opcion == 1) {
-                iniciarSesion();
+
+                System.out.println("Ingrese su cédula:");
+                int cc = teclado.nextInt();
+                System.out.println("Ingrese su clave:");
+                int cl = teclado1.nextInt();
+
+                if (!usuarios.isEmpty()) {
+                    UsuariosRegistrados usuario = usuarios.get(0);
+                    if (usuario.getCedula() == cc && usuario.getClaveNumerica() == cl) {
+                        System.out.println("Inicio de sesión exitoso. Bienvenido, " + usuario.getNombre());
+                        menuSeccion.menu2();
+                    } else {
+                        System.out.println("Credenciales incorrectas.");
+                    }
+                } else {
+                    System.out.println("No hay usuarios registrados.");
+                }
+
             } else if (opcion == 2) {
-                registrarUsuario();
+                System.out.println("Ingrese su nombre:");
+                String nombre = teclado.next();
+                System.out.println("Ingrese su apellido:");
+                String apellido = teclado.next();
+                System.out.println("Ingrese su número de cédula:");
+                int numeroDeCedula = teclado.nextInt();
+                System.out.println("Ingrese su nueva contraseña:");
+                int clave = teclado.nextInt();
+                String fecha = String.valueOf(LocalDate.now());
+                usuarios.add(new UsuariosRegistrados(nombre, apellido, numeroDeCedula, clave,fecha));
+                System.out.println("Registro exitoso.");
             } else if (opcion == 3) {
+
                 verUsuarios();
             } else if (opcion == 4) {
                 guardarUsuarios(archivo, gson);
@@ -62,35 +95,8 @@ public class Menu {
     }
 
     private void iniciarSesion() {
-        System.out.println("Ingrese su cédula:");
-        int cc = teclado.nextInt();
-        System.out.println("Ingrese su clave:");
-        int cl = teclado.nextInt();
-
-        for (UsuariosRegistrados usuario : usuarios) {
-            if (usuario.getCedula() == cc && usuario.getClaveNumerica() == cl) {
-                System.out.println("Inicio de sesión exitoso. Bienvenido, " + usuario.getNombre());
-                return;
-            }
-        }
-        System.out.println("Credenciales incorrectas.");
-    }
-
-    private void registrarUsuario() {
-        System.out.println("Ingrese su nombre:");
-        String nombre = teclado.next();
-        System.out.println("Ingrese su apellido:");
-        String apellido = teclado.next();
-        System.out.println("Ingrese su número de cédula:");
-        int numeroDeCedula = teclado.nextInt();
-        System.out.println("Ingrese su nueva contraseña:");
-        int clave = teclado.nextInt();
-        String fecha = String.valueOf(LocalDate.now());
 
 
-
-        usuarios.add(new UsuariosRegistrados(nombre, apellido, numeroDeCedula, clave,fecha));
-        System.out.println("Registro exitoso.");
     }
 
     private void verUsuarios() {
@@ -108,4 +114,5 @@ public class Menu {
             e.printStackTrace();
         }
     }
+
 }

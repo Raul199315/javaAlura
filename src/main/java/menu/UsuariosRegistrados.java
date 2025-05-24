@@ -53,4 +53,15 @@ public class UsuariosRegistrados {
     public void setClaveNumerica(int claveNumerica) {
         this.claveNumerica = claveNumerica;
     }
+
+    @Override
+    public String toString() {
+        return "UsuariosRegistrados{" +
+                "nombre='" + nombre + '\'' +
+                ", apellido='" + apellido + '\'' +
+                ", cedula=" + cedula +
+                ", claveNumerica=" + claveNumerica +
+                ", fecha='" + fecha + '\'' +
+                '}';
+    }
 }

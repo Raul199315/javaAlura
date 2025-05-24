@@ -31,6 +31,7 @@ public class JavaAluraApplication implements CommandLineRunner {
 		lambda.emitirmensaje("Raul",31);
 		*/
 		/*
+
 		//Practicando Stream
 		List<String> psises = new ArrayList<>();
 		psises.add("Colombia");
