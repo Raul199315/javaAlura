@@ -20,7 +20,7 @@ public class MenuSeccion  {
         opcion =teclado.nextInt();
         if (opcion ==1){
             System.out.printf("Cupo total: " + tarjetaCredito.getCupo() );
-            System.out.printf("Cupu utilizado: " + tarjetaCredito.getCupoUsado());
+            System.out.printf("Cupo utilizado: " + tarjetaCredito.getCupoUsado());
             System.out.printf("Cupo disponible: " + (tarjetaCredito.getCupo()-tarjetaCredito.getCupoUsado()));
         }
     }
